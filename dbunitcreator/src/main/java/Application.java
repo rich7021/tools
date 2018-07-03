@@ -8,8 +8,8 @@ public class Application {
 
     public static void main(String[] args) throws IOException, URISyntaxException {
         ClassLoader classLoader = Application.class.getClassLoader();
-        File file = new File(classLoader.getResource("new_3.txt").getFile());
-        File result = new File("result.txt");
+        File file = new File(classLoader.getResource("raw.txt").getFile());
+        File result = new File("src/main/resources/result.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String resultString = "";
 
