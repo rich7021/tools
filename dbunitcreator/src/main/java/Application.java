@@ -1,5 +1,10 @@
 import java.io.*;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 
 public class Application {
     private static String tableName;
@@ -9,7 +14,7 @@ public class Application {
     public static void main(String[] args) throws IOException, URISyntaxException {
         ClassLoader classLoader = Application.class.getClassLoader();
         File file = new File(classLoader.getResource("raw.txt").getFile());
-        File result = new File("src/main/resources/result.txt");
+        File result = new File(classLoader.getResource("result.txt").getFile());
         BufferedReader br = new BufferedReader(new FileReader(file));
         String resultString = "";
 
@@ -46,12 +51,31 @@ public class Application {
     }
 
     private static String getResult(String[] values) {
-        String colun;
+        String comma;
         StringBuilder sb = new StringBuilder("<");
         sb.append(tableName).append(" ");
         for (int i = 0; i < values.length; i++) {
-            colun = (values[i].contains("\"")) ? "\'" : "\"";
-            sb.append(columns[i]).append("=").append(colun).append(values[i]).append(colun)
+            comma = (values[i].contains("\"")) ? "\'" : "\"";
+            LocalDate ld;
+            try {
+                DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive()
+                        .appendPattern("dd-MMM-yy").toFormatter();
+                ld = LocalDate.parse(values[i], formatter);
+                values[i] = ld.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+            } catch (DateTimeParseException ex) {
+
+            }
+            LocalDateTime ldt;
+            try {
+                DateTimeFormatter formatter = new DateTimeFormatterBuilder().parseCaseInsensitive()
+                        .appendPattern("dd-MMM-yy hh.mm.ss.SSS000000 a").toFormatter();
+                ldt = LocalDateTime.parse(values[i], formatter);
+                values[i] = ldt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss.SSS"));
+            } catch (DateTimeParseException ex) {
+
+            }
+
+            sb.append(columns[i]).append("=").append(comma).append(values[i]).append(comma)
                     .append(" ");
         }
         sb.append("/>\n");
